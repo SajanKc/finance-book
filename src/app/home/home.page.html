@@ -1,0 +1,41 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>📒 Finance Book</ion-title>
+    <!-- <ion-buttons slot="end">
+      <ion-button (click)="clearAllConfirm()" title="Clear all (dev)"
+        >Clear</ion-button
+      >
+    </ion-buttons> -->
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Rs. {{ balance | number:'1.2-2' }}</ion-card-title>
+      <ion-card-subtitle> Available Balance </ion-card-subtitle>
+    </ion-card-header>
+  </ion-card>
+
+  <ion-button expand="block" color="success" (click)="openAddModal()"
+    >➕ Add Transaction</ion-button
+  >
+
+  <ion-list *ngIf="transactions.length; else empty">
+    <ion-item *ngFor="let tx of transactions">
+      <ion-label>
+        <h3>{{ tx.type }}</h3>
+        <p>{{ tx.date | date:'short' }} — {{ tx.note }}</p>
+      </ion-label>
+      <ion-badge [color]="tx.type === 'WITHDRAW' ? 'danger' : 'success'"
+        >{{ formatAmount(tx) }}</ion-badge
+      >
+    </ion-item>
+  </ion-list>
+
+  <ng-template #empty>
+    <div class="ion-text-center ion-padding">
+      No transactions yet. Add your first transaction.
+    </div>
+  </ng-template>
+</ion-content>
