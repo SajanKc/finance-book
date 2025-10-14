@@ -23,7 +23,9 @@
         <p>{{ tx.date | date:'short' }} — {{ tx.remarks }}</p>
       </ion-label>
 
-      <ion-badge [color]="tx.type === 'WITHDRAW' ? 'danger' : 'success'">
+      <ion-badge
+        [color]="tx.type === 'WITHDRAW' ? 'danger' : tx.type === 'SAVING' ? 'success' : 'warning'"
+      >
         {{ formatAmount(tx) }}
       </ion-badge>
 
