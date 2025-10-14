@@ -20,7 +20,13 @@ export class TransactionService {
       const data = localStorage.getItem(STORAGE_KEY);
       if (data) {
         this.transactions = JSON.parse(data) as Transaction[];
-        // transactions stored newest-first; set balance from top or 0
+
+        // Sort transactions by date, newest first
+        this.transactions.sort(
+          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+        );
+
+        // Set balance from the latest transaction or 0
         this.balance = this.transactions[0]?.balanceAfter ?? 0;
         this.transactionSubject.next(this.transactions);
       }
@@ -52,10 +58,15 @@ export class TransactionService {
       ...tx,
       balanceAfter,
     };
-    // keep newest first
-    this.transactions.unshift(newTx);
+
+    this.transactions.push(newTx);
+    this.transactions.sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
+
+    this.transactionSubject.next([...this.transactions]);
     this.saveToStorage();
-    this.transactionSubject.next(this.transactions);
+
     return newTx;
   }
 
@@ -86,21 +97,24 @@ export class TransactionService {
    * 🔄 Recalculate all balances from scratch
    */
   private recalculateBalances() {
+    // Sort by date newest first
+    this.transactions.sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
+
     let runningBalance = 0;
-    // newest first, so recalc from last to first
-    const reversed = [...this.transactions].reverse();
-    reversed.forEach((tx) => {
-      if (tx.type === 'SAVING' || tx.type === 'INTEREST') {
+    // Recalculate from oldest to newest
+    const oldestFirst = [...this.transactions].reverse();
+    oldestFirst.forEach((tx) => {
+      if (tx.type === 'SAVING' || tx.type === 'INTEREST')
         runningBalance += tx.amount;
-      } else if (tx.type === 'WITHDRAW') {
-        runningBalance -= tx.amount;
-      }
+      else if (tx.type === 'WITHDRAW') runningBalance -= tx.amount;
       tx.balanceAfter = Math.round(runningBalance * 100) / 100;
     });
 
-    // restore order (newest first)
-    this.transactions = reversed.reverse();
+    this.transactions = oldestFirst.reverse();
     this.balance = this.transactions[0]?.balanceAfter ?? 0;
+    this.transactionSubject.next([...this.transactions]);
   }
 
   private calculateBalance(

@@ -3,11 +3,12 @@ import { ModalController, IonicModule, AlertController } from '@ionic/angular';
 import { AddTransactionComponent } from '../components/add-transaction/add-transaction.component';
 import { Transaction } from '../models/transaction.mode';
 import { TransactionService } from '../services/transaction.service';
-import { CommonModule } from '@angular/common';
+import { CommonModule, CurrencyPipe } from '@angular/common';
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
   imports: [CommonModule, IonicModule],
+  providers: [CurrencyPipe],
 })
 export class HomePage implements OnInit {
   transactions: Transaction[] = [];
@@ -16,7 +17,8 @@ export class HomePage implements OnInit {
   constructor(
     private modalCtrl: ModalController,
     private alertCtrl: AlertController,
-    private txService: TransactionService
+    private txService: TransactionService,
+    private currencyPipe: CurrencyPipe
   ) {}
 
   ngOnInit() {
@@ -61,7 +63,15 @@ export class HomePage implements OnInit {
     await alert.present();
   }
 
-  formatAmount(tx: Transaction) {
-    return (tx.type === 'WITHDRAW' ? '-' : '+') + ' ' + tx.amount.toFixed(2);
+  formatAmount(tx: Transaction): string {
+    const sign = tx.type === 'WITHDRAW' ? '-' : '+';
+    // format currency in NPR, adjust 'NPR' or 'symbol' as needed
+    const formatted = this.currencyPipe.transform(
+      tx.amount,
+      'Rs ',
+      'symbol',
+      '1.2-2'
+    );
+    return `${sign} ${formatted}`;
   }
 }
