@@ -28,6 +28,7 @@ export class TransactionService {
       console.error('Failed to load transactions', e);
     }
   }
+
   private saveToStorage() {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(this.transactions));
@@ -56,6 +57,50 @@ export class TransactionService {
     this.saveToStorage();
     this.transactionSubject.next(this.transactions);
     return newTx;
+  }
+
+  /**
+   * 📝 Update an existing transaction
+   */
+  updateTransaction(updated: Transaction) {
+    const index = this.transactions.findIndex((t) => t.id === updated.id);
+    if (index === -1) return;
+
+    this.transactions[index] = updated;
+    this.recalculateBalances();
+    this.saveToStorage();
+    this.transactionSubject.next(this.transactions);
+  }
+
+  /**
+   * 🗑️ Delete a transaction by ID
+   */
+  deleteTransaction(id: number) {
+    this.transactions = this.transactions.filter((t) => t.id !== id);
+    this.recalculateBalances();
+    this.saveToStorage();
+    this.transactionSubject.next(this.transactions);
+  }
+
+  /**
+   * 🔄 Recalculate all balances from scratch
+   */
+  private recalculateBalances() {
+    let runningBalance = 0;
+    // newest first, so recalc from last to first
+    const reversed = [...this.transactions].reverse();
+    reversed.forEach((tx) => {
+      if (tx.type === 'SAVING' || tx.type === 'INTEREST') {
+        runningBalance += tx.amount;
+      } else if (tx.type === 'WITHDRAW') {
+        runningBalance -= tx.amount;
+      }
+      tx.balanceAfter = Math.round(runningBalance * 100) / 100;
+    });
+
+    // restore order (newest first)
+    this.transactions = reversed.reverse();
+    this.balance = this.transactions[0]?.balanceAfter ?? 0;
   }
 
   private calculateBalance(
