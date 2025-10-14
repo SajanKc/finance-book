@@ -1,0 +1,7 @@
+ion-header {
+  padding-top: env(safe-area-inset-top);
+}
+
+ion-content.fullscreen {
+  --padding-top: env(safe-area-inset-top);
+}

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { IonicModule, ModalController, NavParams } from '@ionic/angular';
 import { FormBuilder, Validators } from '@angular/forms';
 import { ReactiveFormsModule } from '@angular/forms';
@@ -12,31 +12,33 @@ import { Transaction } from 'src/app/models/transaction.mode';
   imports: [IonicModule, ReactiveFormsModule],
 })
 export class AddTransactionComponent implements OnInit {
+  @Input() transactionToEdit?: Transaction;
+  editMode = false;
+
   form = this.fb.group({
     type: ['SAVING', Validators.required],
-    amount: [0, [Validators.required, Validators.min(0.01)]],
-    note: [''],
+    amount: [
+      null as number | null,
+      [Validators.required, Validators.min(0.01)],
+    ],
+    remarks: [''],
+    date: [this.getLocalISODateString(), Validators.required],
   });
-
-  editMode = false;
-  transactionToEdit?: Transaction;
 
   constructor(
     private modalCtrl: ModalController,
     private fb: FormBuilder,
-    private txService: TransactionService,
-    private navParams: NavParams
+    private txService: TransactionService
   ) {}
 
   ngOnInit() {
-    const tx = this.navParams.get('transaction') as Transaction | undefined;
-    if (tx) {
+    if (this.transactionToEdit) {
       this.editMode = true;
-      this.transactionToEdit = tx;
       this.form.patchValue({
-        type: tx.type,
-        amount: tx.amount,
-        note: tx.note,
+        type: this.transactionToEdit.type,
+        amount: this.transactionToEdit.amount,
+        remarks: this.transactionToEdit.remarks,
+        date: this.transactionToEdit.date,
       });
     }
   }
@@ -45,24 +47,32 @@ export class AddTransactionComponent implements OnInit {
     this.modalCtrl.dismiss({ reload });
   }
 
+  getLocalISODateString() {
+    const now = new Date();
+    return new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+      .toISOString()
+      .slice(0, 16); // "YYYY-MM-DDTHH:mm"
+  }
+
   submit() {
     if (this.form.invalid) return;
-    const { type, amount, note } = this.form.value;
+    const { type, amount, remarks, date } = this.form.value;
 
     if (this.editMode && this.transactionToEdit) {
       const updatedTx: Transaction = {
         ...this.transactionToEdit,
         type: type! as 'SAVING' | 'WITHDRAW' | 'INTEREST',
         amount: Number(amount),
-        note: note || '',
+        remarks: remarks || '',
+        date: date || new Date().toISOString(),
       };
       this.txService.updateTransaction(updatedTx);
     } else {
       this.txService.addTransaction({
         type: type! as 'SAVING' | 'WITHDRAW' | 'INTEREST',
         amount: Number(amount),
-        date: new Date().toISOString(),
-        note: note || '',
+        remarks: remarks || '',
+        date: date || new Date().toISOString(),
       });
     }
 

@@ -1,10 +1,10 @@
 <ion-header>
-  <ion-toolbar color="primary">
+  <ion-toolbar color="secondary">
     <ion-title>📒 Finance Book</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content class="ion-padding" fullscreen>
   <ion-card style="margin: 0 0 10px 0">
     <ion-card-header>
       <ion-card-title>Rs. {{ balance | number:'1.2-2' }}</ion-card-title>
@@ -20,7 +20,7 @@
     <ion-item *ngFor="let tx of transactions">
       <ion-label>
         <h3>{{ tx.type }}</h3>
-        <p>{{ tx.date | date:'short' }} — {{ tx.note }}</p>
+        <p>{{ tx.date | date:'short' }} — {{ tx.remarks }}</p>
       </ion-label>
 
       <ion-badge [color]="tx.type === 'WITHDRAW' ? 'danger' : 'success'">

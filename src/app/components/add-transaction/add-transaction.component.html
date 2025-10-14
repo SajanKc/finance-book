@@ -9,7 +9,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content class="ion-padding" fullscreen>
   <form [formGroup]="form" (ngSubmit)="submit()">
     <ion-item>
       <ion-label>Type</ion-label>
@@ -30,8 +30,13 @@
     </ion-item>
 
     <ion-item>
-      <ion-label position="floating">Note</ion-label>
-      <ion-input formControlName="note"></ion-input>
+      <ion-label position="floating">Date</ion-label>
+      <ion-datetime formControlName="date"></ion-datetime>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Remarks</ion-label>
+      <ion-input formControlName="remarks"></ion-input>
     </ion-item>
 
     <ion-button expand="block" type="submit" [disabled]="form.invalid">

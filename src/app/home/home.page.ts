@@ -40,7 +40,7 @@ export class HomePage implements OnInit {
   async openEditModal(tx: Transaction) {
     const modal = await this.modalCtrl.create({
       component: AddTransactionComponent,
-      componentProps: { transaction: tx },
+      componentProps: { transactionToEdit: tx },
     });
     await modal.present();
   }

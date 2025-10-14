@@ -3,6 +3,6 @@ export interface Transaction {
   type: 'SAVING' | 'WITHDRAW' | 'INTEREST';
   amount: number;
   date: string;
-  note?: string;
+  remarks?: string;
   balanceAfter?: number;
 }
