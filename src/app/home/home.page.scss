@@ -5,3 +5,8 @@ ion-header {
 ion-content.fullscreen {
   --padding-top: env(safe-area-inset-top);
 }
+
+div.flex-spaced {
+  display: flex !important;
+  justify-content: space-between !important;
+}

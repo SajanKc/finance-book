@@ -17,7 +17,7 @@
   </ion-button>
 
   <ion-list *ngIf="transactions.length; else empty" style="margin-top: 10px">
-    <ion-item *ngFor="let tx of transactions">
+    <ion-item *ngFor="let tx of paginatedTransactions">
       <ion-label>
         <h3>{{ tx.type }}</h3>
         <p>{{ tx.date | date:'short' }} — {{ tx.remarks }}</p>
@@ -39,6 +39,52 @@
       </ion-buttons>
     </ion-item>
   </ion-list>
+
+  <ion-item lines="none" class="ion-padding-top">
+    <ion-label slot="start">Items per page</ion-label>
+    <ion-select
+      slot="end"
+      [(ngModel)]="itemsPerPage"
+      (ionChange)="currentPage = 1"
+      interface="popover"
+    >
+      <ion-select-option
+        *ngFor="let option of itemsPerPageOptions"
+        [value]="option"
+      >
+        {{ option }}
+      </ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <div
+    *ngIf="transactions.length > itemsPerPage"
+    class="ion-text-center ion-padding-top"
+  >
+    <ion-button
+      color="secondary"
+      fill="outline"
+      size="small"
+      [disabled]="currentPage === 1"
+      (click)="prevPage()"
+    >
+      <
+    </ion-button>
+
+    <ion-text class="ion-margin-horizontal">
+      Page {{ currentPage }} of {{ totalPages }}
+    </ion-text>
+
+    <ion-button
+      color="secondary"
+      fill="outline"
+      size="small"
+      [disabled]="currentPage === totalPages"
+      (click)="nextPage()"
+    >
+      >
+    </ion-button>
+  </div>
 
   <ng-template #empty>
     <div class="ion-text-center ion-padding">

@@ -4,15 +4,20 @@ import { AddTransactionComponent } from '../components/add-transaction/add-trans
 import { Transaction } from '../models/transaction.mode';
 import { TransactionService } from '../services/transaction.service';
 import { CommonModule, CurrencyPipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-home',
   templateUrl: 'home.page.html',
-  imports: [CommonModule, IonicModule],
+  imports: [CommonModule, IonicModule, FormsModule],
   providers: [CurrencyPipe],
 })
 export class HomePage implements OnInit {
   transactions: Transaction[] = [];
   balance = 0;
+
+  currentPage: number = 1;
+  itemsPerPage: number = 5;
+  readonly itemsPerPageOptions = [5, 10, 25, 50, 100];
 
   constructor(
     private modalCtrl: ModalController,
@@ -27,9 +32,33 @@ export class HomePage implements OnInit {
     this.loadData();
   }
 
+  get paginatedTransactions(): Transaction[] {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    return this.transactions.slice(startIndex, startIndex + this.itemsPerPage);
+  }
+
+  get totalPages(): number {
+    return Math.max(1, Math.ceil(this.transactions.length / this.itemsPerPage));
+  }
+
+  onItemsPerPageChange() {
+    this.currentPage = 1;
+  }
+
+  nextPage() {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+    }
+  }
+
+  prevPage() {
+    if (this.currentPage > 1) this.currentPage--;
+  }
+
   loadData() {
     this.transactions = this.txService.getTransactions();
     this.balance = this.txService.getBalance();
+    this.currentPage = 1; // reset to first page on data reload
   }
 
   async openAddModal() {

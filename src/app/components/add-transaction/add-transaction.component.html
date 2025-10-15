@@ -12,8 +12,8 @@
 <ion-content class="ion-padding" fullscreen>
   <form [formGroup]="form" (ngSubmit)="submit()">
     <ion-item>
-      <ion-label>Type</ion-label>
-      <ion-select formControlName="type">
+      <ion-label slot="start">Type</ion-label>
+      <ion-select slot="end" formControlName="type">
         <ion-select-option value="SAVING">Saving</ion-select-option>
         <ion-select-option value="WITHDRAW">Withdraw</ion-select-option>
         <ion-select-option value="INTEREST">Interest</ion-select-option>
@@ -31,7 +31,10 @@
 
     <ion-item>
       <ion-label position="floating">Date</ion-label>
-      <ion-datetime formControlName="date"></ion-datetime>
+      <ion-datetime
+        formControlName="date"
+        class="ion-margin-vertical"
+      ></ion-datetime>
     </ion-item>
 
     <ion-item>
